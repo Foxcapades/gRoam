@@ -41,10 +41,12 @@ func NewTab(v js.Value) (out *Tab) {
 	out.groupID = chrome.GroupID(v.Get(jsKeyGroupID).Int())
 	out.highlighted = v.Get(jsKeyHighlighted).Bool()
 	out.index = uint16(v.Get(jsKeyIndex).Int())
-	out.mutedInfo = NewMutedInfo(v.Get(jsKeyMutedInfo))
 	out.pinned = v.Get(jsKeyPinned).Bool()
 	out.selected = v.Get(jsKeySelected).Bool()
 	out.windowID = chrome.WindowID(v.Get(jsKeyWindowID).Int())
+
+	mi := chrome.MutedInfo(NewMutedInfo(v.Get(jsKeyMutedInfo)))
+	out.mutedInfo = &mi
 
 	if val := v.Get(jsKeyAudible); !val.IsUndefined() && !val.IsNull() {
 		tmp := val.Bool()

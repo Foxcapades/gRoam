@@ -55,7 +55,8 @@ func NewMessageSender(v js.Value) (out *MessageSender) {
 	}
 
 	if tab := v.Get(jsKeyTab); !tab.IsUndefined() && !tab.IsNull() {
-		out.tab = NewTab(tab)
+		tmp := chrome.Tab(NewTab(tab))
+		out.tab = &tmp
 	}
 
 	if str := v.Get(jsKeyTLSChanID); !str.IsUndefined() && !str.IsNull() {
@@ -78,7 +79,7 @@ type MessageSender struct {
 	id             *string
 	nativeApp      *string
 	origin         *string
-	tab            *Tab
+	tab            *chrome.Tab
 	tlsChannelID   *string
 	url            *string
 }
@@ -108,7 +109,7 @@ func (m *MessageSender) Origin() chrome.OptionalString {
 }
 
 func (m *MessageSender) Tab() chrome.OptionalTab {
-	return &OptionalString{&m.tab}
+	return &OptionalTab{&m.tab}
 }
 
 func (m *MessageSender) TlsChannelId() chrome.OptionalString {
