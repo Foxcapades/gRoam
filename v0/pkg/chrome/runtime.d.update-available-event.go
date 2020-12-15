@@ -1,7 +1,7 @@
 package chrome
 
 type (
-	UpdateAvailableEventListener = func(any interface{}, port Port)
+	UpdateAvailableEventListener = func(UpdateAvailableDetails)
 
 	UpdateAvailableEvent interface {
 		Event
@@ -14,4 +14,3 @@ type (
 		Version() string
 	}
 )
-

@@ -9,30 +9,14 @@ import (
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
-const (
-	jsKeyID                = "id"
-	jsKeyLastError         = "lastError"
-	jsKeyOnConnect         = "onConnect"
-	jsKeyOnConnectExternal = "onConnectExternal"
-	jsKeyOnConnectNative   = "onConnectExternal"
-
-	jsFnConnect         = "connect"
-	jsFnConnectNative   = "connectNative"
-	jsFnGetManifest     = "getManifest"
-	jsFnGetPlatformInfo = "getPlatformInfo"
-	jsFnGetURL          = "getURL"
-	jsFnOpenOptionsPage = "openOptionsPage"
-	jsFnReload          = "reload"
-	jsFnRestart         = "restart"
-	jsFnSetUninstallURL = "setUninstallURL"
-)
-
 type RuntimeAPI struct {
 	runtime js.Value
 
-	conEvent    *ConnectEvent
-	conExtEvent *ConnectEvent
-	conNatEvent *ConnectEvent
+	conEvent     *ConnectEvent
+	conExtEvent  *ConnectEvent
+	conNatEvent  *ConnectEvent
+	installEvent *InstallationEvent
+	eUpdateEvent *UpdateAvailableEvent
 }
 
 func (r *RuntimeAPI) ID() string {
@@ -181,6 +165,11 @@ func (r *RuntimeAPI) OnConnectNative() chrome.ConnectEvent {
 }
 
 func (r *RuntimeAPI) OnInstalled() chrome.InstallationEvent {
+	if r.installEvent == nil {
+		r.installEvent = NewInstallationEvent(r.runtime.Get(jsKeyOnInstalled))
+	}
+
+	return r.installEvent
 }
 
 func (r *RuntimeAPI) OnMessage() chrome.RuntimeMessageEvent {
@@ -202,16 +191,31 @@ func (r *RuntimeAPI) OnSuspendCancelled() chrome.NotificationEvent {
 }
 
 func (r *RuntimeAPI) OnUpdateAvailable() chrome.UpdateAvailableEvent {
+	if r.eUpdateEvent == nil {
+		r.eUpdateEvent = NewUpdateAvailableEvent(r.runtime.Get(jsKeyOnUpdateAvailable))
+	}
+
+	return r.eUpdateEvent
 }
 
 func (r *RuntimeAPI) Release() {
 	if r.conEvent != nil {
 		r.conEvent.Release()
 	}
+
 	if r.conExtEvent != nil {
 		r.conExtEvent.Release()
 	}
+
 	if r.conNatEvent != nil {
 		r.conNatEvent.Release()
+	}
+
+	if r.installEvent != nil {
+		r.installEvent.Release()
+	}
+
+	if r.eUpdateEvent != nil {
+		r.eUpdateEvent.Release()
 	}
 }
