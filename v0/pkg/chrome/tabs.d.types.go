@@ -53,7 +53,7 @@ type OptionalMutedInfo interface {
 
 	Get() MutedInfo
 	Set(MutedInfo)
-	OrElse(MutedInfo)
+	OrElse(MutedInfo) MutedInfo
 	With(func(MutedInfo))
 }
 
@@ -163,7 +163,7 @@ type OptionalTab interface {
 
 	Get() Tab
 	Set(Tab)
-	OrElse(Tab)
+	OrElse(Tab) Tab
 	With(func(Tab))
 }
 
@@ -172,7 +172,7 @@ type OptionalTabSlice interface {
 
 	Get() []Tab
 	Set([]Tab)
-	OrElse([]Tab)
+	OrElse([]Tab) []Tab
 	With(func([]Tab))
 }
 

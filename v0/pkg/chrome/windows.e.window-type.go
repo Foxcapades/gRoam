@@ -16,7 +16,7 @@ type OptionalWindowType interface {
 	Get() WindowType
 	Set(WindowType)
 	Add(WindowType)
-	OrElse(WindowType)
+	OrElse(WindowType) WindowType
 	With(func(WindowType))
 }
 
@@ -26,6 +26,6 @@ type OptionalWindowTypeSlice interface {
 	Get() []WindowType
 	Set([]WindowType)
 	Add(WindowType)
-	OrElse([]WindowType)
+	OrElse([]WindowType) []WindowType
 	With(func([]WindowType))
 }

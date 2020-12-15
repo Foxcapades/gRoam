@@ -10,7 +10,7 @@ type OptionalHeight interface {
 
 	Get() Height
 	Set(Height)
-	OrElse(Height)
+	OrElse(Height) Height
 	With(func(Height))
 }
 
@@ -19,6 +19,6 @@ type OptionalWidth interface {
 
 	Get() Width
 	Set(Width)
-	OrElse(Width)
+	OrElse(Width) Width
 	With(func(Width))
 }

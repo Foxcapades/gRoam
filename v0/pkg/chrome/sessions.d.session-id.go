@@ -7,6 +7,6 @@ type OptionalSessionID interface {
 
 	Get() SessionID
 	Set(SessionID)
-	OrElse(SessionID)
+	OrElse(SessionID) SessionID
 	With(func(SessionID))
 }
