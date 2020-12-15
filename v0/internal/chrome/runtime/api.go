@@ -13,15 +13,17 @@ import (
 type RuntimeAPI struct {
 	runtime js.Value
 
-	conEvent     *ConnectEvent
-	conExtEvent  *ConnectEvent
-	conNatEvent  *ConnectEvent
-	installEvent *InstallationEvent
-	eUpdateEvent *UpdateAvailableEvent
-
+	eConnect         chrome.ConnectEvent
+	eConnectExternal chrome.ConnectEvent
+	eConnectNative   chrome.ConnectEvent
+	eInstall         chrome.InstallationEvent
+	eMessage         chrome.RuntimeMessageEvent
+	eMessageExternal chrome.RuntimeMessageEvent
+	eRestartRequired chrome.RestartRequiredEvent
 	eStartup         chrome.NotificationEvent
 	eSuspend         chrome.NotificationEvent
 	eSuspendCanceled chrome.NotificationEvent
+	eUpdateAvail     chrome.UpdateAvailableEvent
 }
 
 func (r *RuntimeAPI) ID() string {
@@ -146,44 +148,59 @@ func (r *RuntimeAPI) OnBrowserUpdateAvailable() chrome.NotificationEvent {
 }
 
 func (r *RuntimeAPI) OnConnect() chrome.ConnectEvent {
-	if r.conEvent == nil {
-		r.conEvent = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnect))
+	if r.eConnect == nil {
+		r.eConnect = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnect))
 	}
 
-	return r.conEvent
+	return r.eConnect
 }
 
 func (r *RuntimeAPI) OnConnectExternal() chrome.ConnectEvent {
-	if r.conExtEvent == nil {
-		r.conExtEvent = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectExternal))
+	if r.eConnectExternal == nil {
+		r.eConnectExternal = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectExternal))
 	}
 
-	return r.conExtEvent
+	return r.eConnectExternal
 }
 
 func (r *RuntimeAPI) OnConnectNative() chrome.ConnectEvent {
-	if r.conNatEvent == nil {
-		r.conNatEvent = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectNative))
+	if r.eConnectNative == nil {
+		r.eConnectNative = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectNative))
 	}
 
-	return r.conNatEvent
+	return r.eConnectNative
 }
 
 func (r *RuntimeAPI) OnInstalled() chrome.InstallationEvent {
-	if r.installEvent == nil {
-		r.installEvent = NewInstallationEvent(r.runtime.Get(x.JsKeyOnInstalled))
+	if r.eInstall == nil {
+		r.eInstall = NewInstallationEvent(r.runtime.Get(x.JsKeyOnInstalled))
 	}
 
-	return r.installEvent
+	return r.eInstall
 }
 
 func (r *RuntimeAPI) OnMessage() chrome.RuntimeMessageEvent {
+	if r.eMessage == nil {
+		r.eMessage = NewMessageEvent(r.runtime.Get(x.JsKeyOnMessage))
+	}
+
+	return r.eMessage
 }
 
 func (r *RuntimeAPI) OnMessageExternal() chrome.RuntimeMessageEvent {
+	if r.eMessageExternal == nil {
+		r.eMessageExternal = NewMessageEvent(r.runtime.Get(x.JsKeyOnMessageExternal))
+	}
+
+	return r.eMessageExternal
 }
 
 func (r *RuntimeAPI) OnRestartRequired() chrome.RestartRequiredEvent {
+	if r.eRestartRequired == nil {
+		r.eRestartRequired = NewRestartRequiredEvent(r.runtime.Get(x.JsKeyOnRestartRequired))
+	}
+
+	return r.eRestartRequired
 }
 
 func (r *RuntimeAPI) OnStartup() chrome.NotificationEvent {
@@ -211,31 +228,31 @@ func (r *RuntimeAPI) OnSuspendCancelled() chrome.NotificationEvent {
 }
 
 func (r *RuntimeAPI) OnUpdateAvailable() chrome.UpdateAvailableEvent {
-	if r.eUpdateEvent == nil {
-		r.eUpdateEvent = NewUpdateAvailableEvent(r.runtime.Get(x.JsKeyOnUpdateAvailable))
+	if r.eUpdateAvail == nil {
+		r.eUpdateAvail = NewUpdateAvailableEvent(r.runtime.Get(x.JsKeyOnUpdateAvailable))
 	}
 
-	return r.eUpdateEvent
+	return r.eUpdateAvail
 }
 
 func (r *RuntimeAPI) Release() {
-	if r.conEvent != nil {
-		r.conEvent.Release()
+	if r.eConnect != nil {
+		r.eConnect.Release()
 	}
 
-	if r.conExtEvent != nil {
-		r.conExtEvent.Release()
+	if r.eConnectExternal != nil {
+		r.eConnectExternal.Release()
 	}
 
-	if r.conNatEvent != nil {
-		r.conNatEvent.Release()
+	if r.eConnectNative != nil {
+		r.eConnectNative.Release()
 	}
 
-	if r.installEvent != nil {
-		r.installEvent.Release()
+	if r.eInstall != nil {
+		r.eInstall.Release()
 	}
 
-	if r.eUpdateEvent != nil {
-		r.eUpdateEvent.Release()
+	if r.eUpdateAvail != nil {
+		r.eUpdateAvail.Release()
 	}
 }

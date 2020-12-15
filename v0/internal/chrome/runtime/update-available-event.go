@@ -12,49 +12,28 @@ import (
 
 func NewUpdateAvailableEvent(val js.Value) *UpdateAvailableEvent {
 	out := new(UpdateAvailableEvent)
-	out.root = val
-	out.Event.handler = js.FuncOf(out.handler)
-	out.list = make(map[interface{}]chrome.UpdateAvailableEventListener)
+	out.Root = val
+	out.Handler = js.FuncOf(out.handler)
+	out.Listeners = make(map[interface{}]interface{})
 
-	val.Call(jsFnAddListener, out.Event.handler)
+	val.Call(jsFnAddListener, out.Event.Handler)
 
 	return out
 }
 
 type UpdateAvailableEvent struct {
 	x.Event
-
-	list map[interface{}]chrome.UpdateAvailableEventListener
-}
-
-func (u *UpdateAvailableEvent) HasListener(key interface{}) bool {
-	_, ok := u.list[key]
-	return ok
-}
-
-func (u *UpdateAvailableEvent) HasListeners(keys []interface{}) bool {
-	for i := range keys {
-		if u.HasListener(keys[i]) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (u *UpdateAvailableEvent) RemoveListener(key interface{}) {
-	delete(u.list, key)
 }
 
 func (u *UpdateAvailableEvent) AddListener(key interface{}, cb chrome.UpdateAvailableEventListener) {
-	u.list[key] = cb
+	u.Listeners[key] = cb
 }
 
 func (u *UpdateAvailableEvent) handler(_ js.Value, args []js.Value) interface{} {
 	details := NewUpdateAvailableDetails(args[0])
 
-	for _, fn := range u.list {
-		fn(details)
+	for _, fn := range u.Listeners {
+		fn.(chrome.UpdateAvailableEventListener)(details)
 	}
 
 	return nil

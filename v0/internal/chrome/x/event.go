@@ -7,6 +7,16 @@ import (
 	"syscall/js"
 )
 
+func NewEvent(root js.Value, handler js.Func) (out Event) {
+	out.Root = root
+	out.Listeners = make(map[interface{}]interface{})
+	out.Handler = handler
+
+	root.Call(JsFnAddListener, handler)
+
+	return
+}
+
 type Event struct {
 	Root    js.Value
 	Handler js.Func
