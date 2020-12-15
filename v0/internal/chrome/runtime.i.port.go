@@ -14,6 +14,10 @@ const (
 	jsFnPostMessage = "postMessage"
 )
 
+func NewPort(port js.Value) *Port {
+	return &Port{port: port}
+}
+
 type Port struct {
 	port js.Value
 
