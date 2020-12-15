@@ -6,6 +6,7 @@ package chrome
 import (
 	"syscall/js"
 
+	"github.com/foxcapades/groam/v0/internal/chrome/runtime"
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
@@ -19,7 +20,7 @@ type Browser struct {
 }
 
 func (b *Browser) Runtime() chrome.RuntimeAPI {
-	return &RuntimeAPI{runtime: b.chrome.Get(jsKeyRuntime)}
+	return &runtime.RuntimeAPI{runtime: b.chrome.Get(jsKeyRuntime)}
 }
 
 func (b *Browser) Storage() chrome.StorageAPI {
@@ -33,4 +34,3 @@ func (b *Browser) Tabs() chrome.TabAPI {
 func (b *Browser) Windows() chrome.WindowAPI {
 	panic("implement me")
 }
-
