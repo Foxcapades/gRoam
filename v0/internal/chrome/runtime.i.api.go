@@ -10,8 +10,11 @@ import (
 )
 
 const (
-	jsKeyID        = "id"
-	jsKeyLastError = "lastError"
+	jsKeyID                = "id"
+	jsKeyLastError         = "lastError"
+	jsKeyOnConnect         = "onConnect"
+	jsKeyOnConnectExternal = "onConnectExternal"
+	jsKeyOnConnectNative   = "onConnectExternal"
 
 	jsFnConnect         = "connect"
 	jsFnConnectNative   = "connectNative"
@@ -26,6 +29,10 @@ const (
 
 type RuntimeAPI struct {
 	runtime js.Value
+
+	conEvent    *ConnectEvent
+	conExtEvent *ConnectEvent
+	conNatEvent *ConnectEvent
 }
 
 func (r *RuntimeAPI) ID() string {
@@ -72,7 +79,7 @@ func (r *RuntimeAPI) GetPlatformInfo() (out chrome.PlatformInfo) {
 
 	r.runtime.Call(jsFnGetPlatformInfo)
 
-	<- done
+	<-done
 
 	return
 }
@@ -136,7 +143,7 @@ func (r *RuntimeAPI) SetUninstallURL(url string) {
 
 	r.runtime.Call(jsFnSetUninstallURL, url, fn)
 
-	<- done
+	<-done
 }
 
 func (r *RuntimeAPI) SetUninstallURLAsync(url string, cb chrome.EmptyCallback) {
@@ -150,12 +157,27 @@ func (r *RuntimeAPI) OnBrowserUpdateAvailable() chrome.NotificationEvent {
 }
 
 func (r *RuntimeAPI) OnConnect() chrome.ConnectEvent {
+	if r.conEvent == nil {
+		r.conEvent = NewConnectEvent(r.runtime.Get(jsKeyOnConnect))
+	}
+
+	return r.conEvent
 }
 
 func (r *RuntimeAPI) OnConnectExternal() chrome.ConnectEvent {
+	if r.conExtEvent == nil {
+		r.conExtEvent = NewConnectEvent(r.runtime.Get(jsKeyOnConnectExternal))
+	}
+
+	return r.conExtEvent
 }
 
 func (r *RuntimeAPI) OnConnectNative() chrome.ConnectEvent {
+	if r.conNatEvent == nil {
+		r.conNatEvent = NewConnectEvent(r.runtime.Get(jsKeyOnConnectNative))
+	}
+
+	return r.conNatEvent
 }
 
 func (r *RuntimeAPI) OnInstalled() chrome.InstallationEvent {
@@ -183,5 +205,13 @@ func (r *RuntimeAPI) OnUpdateAvailable() chrome.UpdateAvailableEvent {
 }
 
 func (r *RuntimeAPI) Release() {
-
+	if r.conEvent != nil {
+		r.conEvent.Release()
+	}
+	if r.conExtEvent != nil {
+		r.conExtEvent.Release()
+	}
+	if r.conNatEvent != nil {
+		r.conNatEvent.Release()
+	}
 }
