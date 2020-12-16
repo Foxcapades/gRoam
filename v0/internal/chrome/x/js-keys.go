@@ -53,6 +53,7 @@ const (
 	JsKeyState                = "state"
 	JsKeyStatus               = "status"
 	JsKeyTabID                = "tabId"
+	JsKeyTabIDNone            = "TAB_ID_NONE"
 	JsKeyTitle                = "title"
 	JsKeyTop                  = "top"
 	JsKeyType                 = "type"
