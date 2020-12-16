@@ -15,6 +15,6 @@ type OptionalWindowState interface {
 
 	Get() WindowState
 	Set(WindowState)
-	OrElse(WindowState)
+	OrElse(WindowState) WindowState
 	With(func(WindowState))
 }

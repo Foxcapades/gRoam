@@ -1,13 +1,13 @@
 package chrome
 
-type WindowID = int32
+type WindowID int16
 
 type OptionalWindowID interface {
 	Optional
 
 	Get() WindowID
 	Set(WindowID)
-	OrElse(WindowID)
+	OrElse(WindowID) WindowID
 	With(func(WindowID))
 }
 

@@ -134,7 +134,7 @@ func (t *Tab) GroupID() chrome.GroupID {
 }
 
 func (t *Tab) Height() chrome.OptionalHeight {
-	return &x.OptionalHeight{V: &t.height}
+	return &x.OptionalHeight{Value: &t.height}
 }
 
 func (t *Tab) Highlighted() bool {

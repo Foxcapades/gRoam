@@ -4,6 +4,7 @@
 package x
 
 import (
+	"sync"
 	"syscall/js"
 
 	"github.com/foxcapades/groam/v0/pkg/chrome"
@@ -19,11 +20,12 @@ func EmptyAsyncCB(cb chrome.EmptyCallback) js.Func {
 	})
 }
 
-func EmptySyncCB() (js.Func, chan bool) {
-	done := make(chan bool, 1)
-
-	return js.FuncOf(func(js.Value, []js.Value) interface{} {
-		done <- true
+func EmptySyncCB() (out js.Func, wait sync.WaitGroup) {
+	wait.Add(1)
+	out = js.FuncOf(func(js.Value, []js.Value) interface{} {
+		wait.Done()
 		return nil
-	}), done
+	})
+
+	return
 }

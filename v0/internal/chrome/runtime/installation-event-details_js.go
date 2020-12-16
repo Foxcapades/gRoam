@@ -6,25 +6,20 @@ package runtime
 import (
 	"syscall/js"
 
-	chrome2 "github.com/foxcapades/groam/v0/internal/chrome"
 	"github.com/foxcapades/groam/v0/internal/chrome/x"
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
-const (
-	jsKeyPreviousVersion = "previousVersion"
-)
-
 func NewInstallationEventDetails(val js.Value) *InstallationEventDetails {
 	out := new(InstallationEventDetails)
-	out.reason = chrome.OnInstalledReason(val.Get(chrome2.jsKeyReason).String())
+	out.reason = chrome.OnInstalledReason(val.Get(x.JsKeyReason).String())
 
-	if v := val.Get(chrome2.jsKeyID); !v.IsUndefined() && !v.IsNull() {
+	if v := val.Get(x.JsKeyID); !v.IsUndefined() && !v.IsNull() {
 		tmp := v.String()
 		out.id = &tmp
 	}
 
-	if v := val.Get(jsKeyPreviousVersion); !v.IsUndefined() && !v.IsNull() {
+	if v := val.Get(x.JsKeyPreviousVersion); !v.IsUndefined() && !v.IsNull() {
 		tmp := v.String()
 		out.id = &tmp
 	}
@@ -39,11 +34,11 @@ type InstallationEventDetails struct {
 }
 
 func (i *InstallationEventDetails) ID() chrome.OptionalString {
-	return &x.OptionalString{&i.id}
+	return &x.OptionalString{V: &i.id}
 }
 
 func (i *InstallationEventDetails) PreviousVersion() chrome.OptionalString {
-	return &x.OptionalString{&i.previousVersion}
+	return &x.OptionalString{V: &i.previousVersion}
 }
 
 func (i *InstallationEventDetails) Reason() chrome.OnInstalledReason {

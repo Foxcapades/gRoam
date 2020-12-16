@@ -173,6 +173,7 @@ type OptionalTabSlice interface {
 	Get() []Tab
 	Set([]Tab)
 	OrElse([]Tab) []Tab
+	Add(Tab)
 	With(func([]Tab))
 }
 

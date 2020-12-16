@@ -15,7 +15,6 @@ type OptionalWindowType interface {
 
 	Get() WindowType
 	Set(WindowType)
-	Add(WindowType)
 	OrElse(WindowType) WindowType
 	With(func(WindowType))
 }

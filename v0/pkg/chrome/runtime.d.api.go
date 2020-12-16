@@ -166,7 +166,7 @@ type RuntimeAPI interface {
 	// out of date and you'd like to prompt a user to update. Most other uses of
 	// requestUpdateCheck, such as calling it unconditionally based on a repeating
 	// timer, probably only serve to waste client, network, and server resources.
-	RequestUpdateCheck() (RequestUpdateCheckStatus, UpdateResponse)
+	RequestUpdateCheck() (RequestUpdateCheckStatus, UpdateAvailableDetails)
 
 	// Asynchronously requests an immediate update check be done for this
 	// app/extension.
@@ -231,9 +231,44 @@ type RuntimeAPI interface {
 	//   msg   = The message to send. This message should be a JSON-ifiable
 	//           object.
 	//   opts  =
+	//
+	// Returns:
+	//   [0] = the response message.
+	SendMessage(extID *string, msg interface{}, opts MessageOptions) interface{}
+
+	// Sends a single message to event listeners within your extension/app or a
+	// different extension/app.
+	//
+	// Similar to connect but only sends a single message, with an optional
+	// response.
+	//
+	// If sending to your extension, the onMessage event will be fired in every
+	// frame of your extension (except for the sender's frame), or
+	// onMessageExternal, if a different extension.
+	//
+	// Note that extensions cannot send messages to content scripts using this
+	// method.  To send messages to content scripts, use tabs.sendMessage.
+	//
+	// Arguments:
+	//   extID = The ID of the extension/app to send the message to. If omitted,
+	//           the message will be sent to your own extension/app. Required if
+	//           sending messages from a web page for web messaging.
+	//   msg   = The message to send. This message should be a JSON-ifiable
+	//           object.
+	//   opts  =
 	//   cb    = A callback function that should take one any/interface typed
 	//           argument.  This argument will contain the response message.
 	SendMessageAsync(extID *string, msg interface{}, opts MessageOptions, cb AnyCallback)
+
+	// Send a single message to a native application.
+	//
+	// Arguments:
+	//   app = The name of the native messaging host.
+	//   msg = The message that will be passed to the native messaging host.
+	//
+	// Returns:
+	//   [0] = This argument will contain the response message.
+	SendNativeMessage(app string, msg interface{}) interface{}
 
 	// Send a single message to a native application.
 	//
@@ -342,12 +377,7 @@ type RuntimeAPI interface {
 	Release()
 }
 
-
-type RequestUpdateCheckCallback = func(RequestUpdateCheckStatus, UpdateResponse)
-
-type UpdateResponse interface {
-	Version() string
-}
+type RequestUpdateCheckCallback = func(RequestUpdateCheckStatus, UpdateAvailableDetails)
 
 type MessageOptions interface {
 	// Whether the TLS channel ID will be passed into onMessageExternal for
