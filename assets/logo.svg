@@ -1,0 +1,42 @@
+<!--
+Outer Triangle
+  Point 1:  (0, 34.64)
+  Point 2:  (20, 0)
+  Point 3:  (40, 34.64)
+  Centroid: (20, 23.09)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+  <mask id="triag">
+    <polygon points="0 34.64, 20 0, 40 34.64" fill="white"/>
+  </mask>
+
+  <linearGradient id="pinkGrad">
+    <stop offset="0%" stop-color="#CE49E6" />
+    <stop offset="100%" stop-color="#D92B59" />
+  </linearGradient>
+  <linearGradient id="purpGrad">
+    <stop offset="50%" stop-color="#3E54B3" />
+    <stop offset="100%" stop-color="#572DA4" />
+  </linearGradient>
+  <linearGradient id="tealGrad">
+    <stop offset="50%" stop-color="#55CC51" />
+    <stop offset="100%" stop-color="#1D8C91" />
+  </linearGradient>
+  <linearGradient id="blueGrad" gradientTransform="rotate(90)">
+    <stop offset="50%" stop-color="#4b8af6" />
+    <stop offset="100%" stop-color="#2470F1" />
+  </linearGradient>
+
+  <g mask="url(#triag)" transform="translate(2 4.5)">
+    <polygon points="0% 78.72%, 45.45% 0%, 90.9% 78.72%" fill="white"/>
+    <rect width="21" height="8" fill="url(#pinkGrad)" y="26.64" x="19" />
+    <rect width="40" height="8" fill="url(#purpGrad)" transform="translate(20) rotate(60)" />
+    <rect width="40" height="8" fill="url(#tealGrad)" transform="translate(20 -8) rotate(120 0 8)" />
+    <rect width="20" height="8" fill="#CE49E6" y="26.64" />
+    <polygon
+      points="0 7.698, 4.444 0, 8.889 7.698"
+      fill="url(#blueGrad)"
+      transform="translate(15.556 17.948)"
+    />
+  </g>
+</svg>

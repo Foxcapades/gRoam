@@ -6,11 +6,12 @@ package runtime
 import (
 	"syscall/js"
 
+	"github.com/foxcapades/groam/v0/internal/chrome/windows"
 	"github.com/foxcapades/groam/v0/internal/chrome/x"
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
-type RuntimeAPI struct {
+type API struct {
 	runtime js.Value
 
 	eBrowserUpdate   chrome.NotificationEvent
@@ -27,33 +28,52 @@ type RuntimeAPI struct {
 	eUpdateAvail     chrome.UpdateAvailableEvent
 }
 
-func (r *RuntimeAPI) ID() string {
+func (r *API) ID() string {
 	return r.runtime.Get(x.JsKeyID).String()
 }
 
-func (r *RuntimeAPI) LastError() interface{} {
+func (r *API) LastError() interface{} {
 	return r.runtime.Get(x.JsKeyLastError)
 }
 
-func (r *RuntimeAPI) Connect(extID string, info chrome.ConnectInfo) chrome.Port {
-	return &Port{port: r.runtime.Call(x.JsFnConnect, extID, info.(*ConnectInfo).JS())}
+func (r *API) Connect(extID string, info chrome.ConnectInfo) chrome.Port {
+	return &Port{port: r.runtime.Call(x.JsFnConnect, extID, SerializeConnectInfo(info))}
 }
 
-func (r *RuntimeAPI) ConnectNative(app string) chrome.Port {
+func (r *API) ConnectNative(app string) chrome.Port {
 	return &Port{port: r.runtime.Call(x.JsFnConnectNative, app)}
 }
 
-func (r *RuntimeAPI) GetBackgroundPage() chrome.Window {
+func (r *API) GetBackgroundPage() (out chrome.Window) {
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		out = windows.NewWindow(args[0])
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	r.runtime.Call(x.JsFnGetBackgroundPage, fn)
+	wg.Wait()
+
+	return
 }
 
-func (r *RuntimeAPI) GetBackgroundPageAsync(cb chrome.WindowCallback) {
+func (r *API) GetBackgroundPageAsync(cb chrome.WindowCallback) {
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		cb(windows.NewWindow(args[0]))
+		return nil
+	})
+	defer fn.Release()
+
+	r.runtime.Call(x.JsFnGetBackgroundPage, fn)
 }
 
-func (r *RuntimeAPI) GetManifest() interface{} {
+func (r *API) GetManifest() interface{} {
 	return r.runtime.Call(x.JsFnGetManifest)
 }
 
-func (r *RuntimeAPI) GetPackageDirectoryEntry() (out chrome.DirectoryEntry) {
+func (r *API) GetPackageDirectoryEntry() (out chrome.DirectoryEntry) {
 	wait := x.NewWaitSingle()
 
 	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
@@ -69,7 +89,7 @@ func (r *RuntimeAPI) GetPackageDirectoryEntry() (out chrome.DirectoryEntry) {
 	return
 }
 
-func (r *RuntimeAPI) GetPackageDirectoryEntryAsync(cb chrome.DirectoryEntryCallback) {
+func (r *API) GetPackageDirectoryEntryAsync(cb chrome.DirectoryEntryCallback) {
 	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		cb(x.NewDirectoryEntry(args[0]))
 		return nil
@@ -79,7 +99,7 @@ func (r *RuntimeAPI) GetPackageDirectoryEntryAsync(cb chrome.DirectoryEntryCallb
 	r.runtime.Call(x.JsFnGetPackageDirectoryEntry, fn)
 }
 
-func (r *RuntimeAPI) GetPlatformInfo() (out chrome.PlatformInfo) {
+func (r *API) GetPlatformInfo() (out chrome.PlatformInfo) {
 	done := x.NewWaitSingle()
 
 	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
@@ -96,7 +116,7 @@ func (r *RuntimeAPI) GetPlatformInfo() (out chrome.PlatformInfo) {
 	return
 }
 
-func (r *RuntimeAPI) GetPlatformInfoAsync(cb chrome.PlatformInfoCallback) {
+func (r *API) GetPlatformInfoAsync(cb chrome.PlatformInfoCallback) {
 	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
 		cb(NewPlatformInfo(args[0]))
 		return nil
@@ -106,11 +126,11 @@ func (r *RuntimeAPI) GetPlatformInfoAsync(cb chrome.PlatformInfoCallback) {
 	r.runtime.Call(x.JsFnGetPlatformInfo)
 }
 
-func (r *RuntimeAPI) GetURL(path string) string {
+func (r *API) GetURL(path string) string {
 	return r.runtime.Call(x.JsFnGetURL, path).String()
 }
 
-func (r *RuntimeAPI) OpenOptionsPage() {
+func (r *API) OpenOptionsPage() {
 	fn, done := x.EmptySyncCB()
 	defer fn.Release()
 
@@ -118,16 +138,16 @@ func (r *RuntimeAPI) OpenOptionsPage() {
 	done.Wait()
 }
 
-func (r *RuntimeAPI) OpenOptionsPageAsync(cb chrome.EmptyCallback) {
+func (r *API) OpenOptionsPageAsync(cb chrome.EmptyCallback) {
 	fn := x.EmptyAsyncCB(cb)
 	defer fn.Release()
 }
 
-func (r *RuntimeAPI) Reload() {
+func (r *API) Reload() {
 	r.runtime.Call(x.JsFnReload)
 }
 
-func (r *RuntimeAPI) RequestUpdateCheck() (
+func (r *API) RequestUpdateCheck() (
 	status chrome.RequestUpdateCheckStatus,
 	info chrome.UpdateAvailableDetails,
 ) {
@@ -147,17 +167,17 @@ func (r *RuntimeAPI) RequestUpdateCheck() (
 	return
 }
 
-func (r *RuntimeAPI) RequestUpdateCheckAsync(cb chrome.RequestUpdateCheckCallback) {
+func (r *API) RequestUpdateCheckAsync(cb chrome.RequestUpdateCheckCallback) {
 	go func() {
 		cb(r.RequestUpdateCheck())
 	}()
 }
 
-func (r *RuntimeAPI) Restart() {
+func (r *API) Restart() {
 	r.runtime.Call(x.JsFnRestart)
 }
 
-func (r *RuntimeAPI) RestartAfterDelay(seconds int) {
+func (r *API) RestartAfterDelay(seconds int) {
 	done := x.NewWaitSingle()
 
 	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
@@ -172,14 +192,14 @@ func (r *RuntimeAPI) RestartAfterDelay(seconds int) {
 	return
 }
 
-func (r *RuntimeAPI) RestartAfterDelayAsync(seconds int, cb chrome.EmptyCallback) {
+func (r *API) RestartAfterDelayAsync(seconds int, cb chrome.EmptyCallback) {
 	go func() {
 		r.RestartAfterDelay(seconds)
 		cb()
 	}()
 }
 
-func (r *RuntimeAPI) SendMessage(
+func (r *API) SendMessage(
 	extID *string,
 	msg interface{},
 	opts chrome.MessageOptions,
@@ -200,7 +220,7 @@ func (r *RuntimeAPI) SendMessage(
 	return
 }
 
-func (r *RuntimeAPI) SendMessageAsync(
+func (r *API) SendMessageAsync(
 	extID *string,
 	msg interface{},
 	opts chrome.MessageOptions,
@@ -211,7 +231,7 @@ func (r *RuntimeAPI) SendMessageAsync(
 	}()
 }
 
-func (r *RuntimeAPI) SendNativeMessage(app string, msg interface{}) (response interface{}) {
+func (r *API) SendNativeMessage(app string, msg interface{}) (response interface{}) {
 	done := x.NewWaitSingle()
 
 	fn := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -228,13 +248,13 @@ func (r *RuntimeAPI) SendNativeMessage(app string, msg interface{}) (response in
 	return
 }
 
-func (r *RuntimeAPI) SendNativeMessageAsync(app string, msg interface{}, cb chrome.AnyCallback) {
+func (r *API) SendNativeMessageAsync(app string, msg interface{}, cb chrome.AnyCallback) {
 	go func() {
 		cb(r.SendNativeMessage(app, msg))
 	}()
 }
 
-func (r *RuntimeAPI) SetUninstallURL(url string) {
+func (r *API) SetUninstallURL(url string) {
 	fn, done := x.EmptySyncCB()
 	defer fn.Release()
 
@@ -242,14 +262,14 @@ func (r *RuntimeAPI) SetUninstallURL(url string) {
 	done.Wait()
 }
 
-func (r *RuntimeAPI) SetUninstallURLAsync(url string, cb chrome.EmptyCallback) {
+func (r *API) SetUninstallURLAsync(url string, cb chrome.EmptyCallback) {
 	fn := x.EmptyAsyncCB(cb)
 	defer fn.Release()
 
 	r.runtime.Call(x.JsFnSetUninstallURL, url, fn)
 }
 
-func (r *RuntimeAPI) OnBrowserUpdateAvailable() chrome.NotificationEvent {
+func (r *API) OnBrowserUpdateAvailable() chrome.NotificationEvent {
 	if r.eBrowserUpdate == nil {
 		r.eBrowserUpdate = NewNotificationEvent(r.runtime.Get(x.JsKeyOnBrowserUpdateAvail))
 	}
@@ -257,7 +277,7 @@ func (r *RuntimeAPI) OnBrowserUpdateAvailable() chrome.NotificationEvent {
 	return r.eBrowserUpdate
 }
 
-func (r *RuntimeAPI) OnConnect() chrome.ConnectEvent {
+func (r *API) OnConnect() chrome.ConnectEvent {
 	if r.eConnect == nil {
 		r.eConnect = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnect))
 	}
@@ -265,7 +285,7 @@ func (r *RuntimeAPI) OnConnect() chrome.ConnectEvent {
 	return r.eConnect
 }
 
-func (r *RuntimeAPI) OnConnectExternal() chrome.ConnectEvent {
+func (r *API) OnConnectExternal() chrome.ConnectEvent {
 	if r.eConnectExternal == nil {
 		r.eConnectExternal = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectExternal))
 	}
@@ -273,7 +293,7 @@ func (r *RuntimeAPI) OnConnectExternal() chrome.ConnectEvent {
 	return r.eConnectExternal
 }
 
-func (r *RuntimeAPI) OnConnectNative() chrome.ConnectEvent {
+func (r *API) OnConnectNative() chrome.ConnectEvent {
 	if r.eConnectNative == nil {
 		r.eConnectNative = NewConnectEvent(r.runtime.Get(x.JsKeyOnConnectNative))
 	}
@@ -281,7 +301,7 @@ func (r *RuntimeAPI) OnConnectNative() chrome.ConnectEvent {
 	return r.eConnectNative
 }
 
-func (r *RuntimeAPI) OnInstalled() chrome.InstallationEvent {
+func (r *API) OnInstalled() chrome.InstallationEvent {
 	if r.eInstall == nil {
 		r.eInstall = NewInstallationEvent(r.runtime.Get(x.JsKeyOnInstalled))
 	}
@@ -289,7 +309,7 @@ func (r *RuntimeAPI) OnInstalled() chrome.InstallationEvent {
 	return r.eInstall
 }
 
-func (r *RuntimeAPI) OnMessage() chrome.RuntimeMessageEvent {
+func (r *API) OnMessage() chrome.RuntimeMessageEvent {
 	if r.eMessage == nil {
 		r.eMessage = NewMessageEvent(r.runtime.Get(x.JsKeyOnMessage))
 	}
@@ -297,7 +317,7 @@ func (r *RuntimeAPI) OnMessage() chrome.RuntimeMessageEvent {
 	return r.eMessage
 }
 
-func (r *RuntimeAPI) OnMessageExternal() chrome.RuntimeMessageEvent {
+func (r *API) OnMessageExternal() chrome.RuntimeMessageEvent {
 	if r.eMessageExternal == nil {
 		r.eMessageExternal = NewMessageEvent(r.runtime.Get(x.JsKeyOnMessageExternal))
 	}
@@ -305,7 +325,7 @@ func (r *RuntimeAPI) OnMessageExternal() chrome.RuntimeMessageEvent {
 	return r.eMessageExternal
 }
 
-func (r *RuntimeAPI) OnRestartRequired() chrome.RestartRequiredEvent {
+func (r *API) OnRestartRequired() chrome.RestartRequiredEvent {
 	if r.eRestartRequired == nil {
 		r.eRestartRequired = NewRestartRequiredEvent(r.runtime.Get(x.JsKeyOnRestartRequired))
 	}
@@ -313,7 +333,7 @@ func (r *RuntimeAPI) OnRestartRequired() chrome.RestartRequiredEvent {
 	return r.eRestartRequired
 }
 
-func (r *RuntimeAPI) OnStartup() chrome.NotificationEvent {
+func (r *API) OnStartup() chrome.NotificationEvent {
 	if r.eStartup == nil {
 		r.eStartup = NewNotificationEvent(r.runtime.Get(x.JsKeyOnStartup))
 	}
@@ -321,7 +341,7 @@ func (r *RuntimeAPI) OnStartup() chrome.NotificationEvent {
 	return r.eStartup
 }
 
-func (r *RuntimeAPI) OnSuspend() chrome.NotificationEvent {
+func (r *API) OnSuspend() chrome.NotificationEvent {
 	if r.eSuspend == nil {
 		r.eSuspend = NewNotificationEvent(r.runtime.Get(x.JsKeyOnSuspend))
 	}
@@ -329,7 +349,7 @@ func (r *RuntimeAPI) OnSuspend() chrome.NotificationEvent {
 	return r.eSuspend
 }
 
-func (r *RuntimeAPI) OnSuspendCancelled() chrome.NotificationEvent {
+func (r *API) OnSuspendCancelled() chrome.NotificationEvent {
 	if r.eSuspendCanceled == nil {
 		r.eSuspendCanceled = NewNotificationEvent(r.runtime.Get(x.JsKeyOnSuspendCanceled))
 	}
@@ -337,7 +357,7 @@ func (r *RuntimeAPI) OnSuspendCancelled() chrome.NotificationEvent {
 	return r.eSuspendCanceled
 }
 
-func (r *RuntimeAPI) OnUpdateAvailable() chrome.UpdateAvailableEvent {
+func (r *API) OnUpdateAvailable() chrome.UpdateAvailableEvent {
 	if r.eUpdateAvail == nil {
 		r.eUpdateAvail = NewUpdateAvailableEvent(r.runtime.Get(x.JsKeyOnUpdateAvailable))
 	}
@@ -345,7 +365,7 @@ func (r *RuntimeAPI) OnUpdateAvailable() chrome.UpdateAvailableEvent {
 	return r.eUpdateAvail
 }
 
-func (r *RuntimeAPI) Release() {
+func (r *API) Release() {
 	if r.eBrowserUpdate != nil {
 		r.eBrowserUpdate.Release()
 	}

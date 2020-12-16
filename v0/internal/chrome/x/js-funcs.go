@@ -4,6 +4,7 @@ const (
 	JsFnAddListener              = "addListener"
 	JsFnConnect                  = "connect"
 	JsFnConnectNative            = "connectNative"
+	JsFnGetBackgroundPage        = "getBackgroundPage"
 	JsFnGetManifest              = "getManifest"
 	JsFnGetPlatformInfo          = "getPlatformInfo"
 	JsFnGetURL                   = "getURL"

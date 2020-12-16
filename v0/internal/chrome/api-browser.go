@@ -20,7 +20,7 @@ type Browser struct {
 }
 
 func (b *Browser) Runtime() chrome.RuntimeAPI {
-	return &runtime.RuntimeAPI{runtime: b.chrome.Get(jsKeyRuntime)}
+	return &runtime.API{runtime: b.chrome.Get(jsKeyRuntime)}
 }
 
 func (b *Browser) Storage() chrome.StorageAPI {

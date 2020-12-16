@@ -7,18 +7,32 @@ import (
 	"syscall/js"
 
 	"github.com/foxcapades/groam/v0/internal/chrome/x"
+	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
-func (c *ConnectInfo) JS() (out js.Value) {
-	out = x.JsObject.New()
-
-	if c.includeTLS != nil {
-		out.Set(x.JsKeyIncludeTLSChannelID, *c.includeTLS)
+func NewConnectInfo(js js.Value) chrome.ConnectInfo {
+	if js.IsUndefined() || js.IsNull() {
+		return nil
 	}
 
-	if c.name != nil {
-		out.Set(x.JsKeyName, *c.name)
+	out := new(ConnectInfo)
+	out.includeTLS = x.NewOptionalBool(js.Get(x.JsKeyIncludeTLSChannelID))
+	out.name = x.NewOptionalString(js.Get(x.JsKeyName))
+
+	return out
+}
+
+func SerializeConnectInfo(ci chrome.ConnectInfo) (out js.Value) {
+	out = x.JsObject.New()
+
+	if v := ci.IncludeTLSChannelID(); v.IsPresent() {
+		out.Set(x.JsKeyIncludeTLSChannelID, v.Get())
+	}
+
+	if v := ci.Name(); v.IsPresent() {
+		out.Set(x.JsKeyName, v.Get())
 	}
 
 	return
+
 }

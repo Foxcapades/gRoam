@@ -1,19 +1,18 @@
 package runtime
 
 import (
-	"github.com/foxcapades/groam/v0/internal/chrome/x"
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
 type ConnectInfo struct {
-	includeTLS *bool
-	name       *string
+	includeTLS chrome.OptionalBool
+	name       chrome.OptionalString
 }
 
 func (c *ConnectInfo) IncludeTLSChannelID() chrome.OptionalBool {
-	return &x.OptionalBool{Value: &c.includeTLS}
+	return c.includeTLS
 }
 
 func (c *ConnectInfo) Name() chrome.OptionalString {
-	return &x.OptionalString{value: &c.name}
+	return c.name
 }
