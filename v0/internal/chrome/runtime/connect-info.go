@@ -11,9 +11,9 @@ type ConnectInfo struct {
 }
 
 func (c *ConnectInfo) IncludeTLSChannelID() chrome.OptionalBool {
-	return &x.OptionalBool{V: &c.includeTLS}
+	return &x.OptionalBool{Value: &c.includeTLS}
 }
 
 func (c *ConnectInfo) Name() chrome.OptionalString {
-	return &x.OptionalString{V: &c.name}
+	return &x.OptionalString{value: &c.name}
 }

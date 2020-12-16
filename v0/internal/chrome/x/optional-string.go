@@ -1,39 +1,39 @@
 package x
 
 type OptionalString struct {
-	V **string
+	value *string
 }
 
 func (o *OptionalString) IsPresent() bool {
-	return *o.V != nil
+	return o.value != nil
 }
 
 func (o *OptionalString) IsAbsent() bool {
-	return *o.V == nil
+	return o.value == nil
 }
 
 func (o *OptionalString) Clear() {
-	*o.V = nil
+	o.value = nil
 }
 
 func (o *OptionalString) Get() string {
-	return **o.V
+	return *o.value
 }
 
 func (o *OptionalString) Set(b string) {
-	*o.V = &b
+	o.value = &b
 }
 
 func (o *OptionalString) OrElse(b string) string {
-	if *o.V == nil {
+	if o.value == nil {
 		return b
 	}
 
-	return **o.V
+	return *o.value
 }
 
 func (o *OptionalString) With(f func(string)) {
-	if *o.V != nil {
-		f(**o.V)
+	if o.value != nil {
+		f(*o.value)
 	}
 }

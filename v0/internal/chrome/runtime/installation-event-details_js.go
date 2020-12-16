@@ -34,11 +34,11 @@ type InstallationEventDetails struct {
 }
 
 func (i *InstallationEventDetails) ID() chrome.OptionalString {
-	return &x.OptionalString{V: &i.id}
+	return &x.OptionalString{value: &i.id}
 }
 
 func (i *InstallationEventDetails) PreviousVersion() chrome.OptionalString {
-	return &x.OptionalString{V: &i.previousVersion}
+	return &x.OptionalString{value: &i.previousVersion}
 }
 
 func (i *InstallationEventDetails) Reason() chrome.OnInstalledReason {

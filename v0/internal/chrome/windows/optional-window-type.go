@@ -5,27 +5,27 @@ import (
 )
 
 type OptionalWindowType struct {
-	Value *chrome.WindowType
+	value *chrome.WindowType
 }
 
 func (o *OptionalWindowType) IsPresent() bool {
-	return o.Value != nil
+	return o.value != nil
 }
 
 func (o *OptionalWindowType) IsAbsent() bool {
-	return o.Value == nil
+	return o.value == nil
 }
 
 func (o *OptionalWindowType) Clear() {
-	o.Value = nil
+	o.value = nil
 }
 
 func (o *OptionalWindowType) Get() chrome.WindowType {
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalWindowType) Set(windowType chrome.WindowType) {
-	o.Value = &windowType
+	o.value = &windowType
 }
 
 func (o *OptionalWindowType) OrElse(windowType chrome.WindowType) chrome.WindowType {

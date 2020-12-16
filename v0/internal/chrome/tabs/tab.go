@@ -1,6 +1,3 @@
-// +build js,wasm
-// +build chrome
-
 package tabs
 
 import (
@@ -10,79 +7,6 @@ import (
 	"github.com/foxcapades/groam/v0/internal/chrome/x"
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
-
-func NewTab(v js.Value) (out *Tab) {
-	if v.IsUndefined() || v.IsNull() {
-		return
-	}
-
-	out = new(Tab)
-
-	out.active = v.Get(x.JsKeyActive).Bool()
-	out.autoDiscardable = v.Get(x.JsKeyAutoDiscardable).Bool()
-	out.discarded = v.Get(x.JsKeyDiscarded).Bool()
-	out.groupID = chrome.GroupID(v.Get(x.JsKeyGroupID).Int())
-	out.highlighted = v.Get(x.JsKeyHighlighted).Bool()
-	out.index = uint16(v.Get(x.JsKeyIndex).Int())
-	out.pinned = v.Get(x.JsKeyPinned).Bool()
-	out.selected = v.Get(x.JsKeySelected).Bool()
-	out.windowID = chrome.WindowID(v.Get(x.JsKeyWindowID).Int())
-
-	mi := chrome.MutedInfo(NewMutedInfo(v.Get(x.JsKeyMutedInfo)))
-	out.mutedInfo = &mi
-
-	if val := v.Get(x.JsKeyAudible); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.Bool()
-		out.audible = &tmp
-	}
-
-	if val := v.Get(x.JsKeyFavIconURL); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.favIconURL = &tmp
-	}
-
-	if val := v.Get(x.JsKeyHeight); !val.IsUndefined() && !val.IsNull() {
-		tmp := uint16(val.Int())
-		out.height = &tmp
-	}
-
-	if val := v.Get(x.JsKeyOpenerTabID); !val.IsUndefined() && !val.IsNull() {
-		tmp := int32(val.Int())
-		out.openerTabID = (*chrome.TabID)(&tmp)
-	}
-
-	if val := v.Get(x.JsKeyPendingURL); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.pendingURL = &tmp
-	}
-
-	if val := v.Get(x.JsKeySessionID); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.sessionID = (*chrome.SessionID)(&tmp)
-	}
-
-	if val := v.Get(x.JsKeyStatus); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.status = (*chrome.TabStatus)(&tmp)
-	}
-
-	if val := v.Get(x.JsKeyTitle); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.title = &tmp
-	}
-
-	if val := v.Get(x.JsKeyURL); !val.IsUndefined() && !val.IsNull() {
-		tmp := val.String()
-		out.url = &tmp
-	}
-
-	if val := v.Get(x.JsKeyWidth); !val.IsUndefined() && !val.IsNull() {
-		tmp := uint16(val.Int())
-		out.width = &tmp
-	}
-
-	return
-}
 
 type Tab struct {
 	active          bool
@@ -95,18 +19,18 @@ type Tab struct {
 	index           uint16
 	groupID         chrome.GroupID
 	windowID        chrome.WindowID
-	audible         *bool
-	favIconURL      *string
-	pendingURL      *string
-	title           *string
-	url             *string
-	height          *chrome.Height
-	id              *chrome.TabID
-	openerTabID     *chrome.TabID
-	mutedInfo       *chrome.MutedInfo
-	sessionID       *chrome.SessionID
-	status          *chrome.TabStatus
-	width           *chrome.Width
+	audible         chrome.OptionalBool
+	favIconURL      chrome.OptionalString
+	pendingURL      chrome.OptionalString
+	title           chrome.OptionalString
+	url             chrome.OptionalString
+	height          chrome.OptionalHeight
+	id              chrome.OptionalTabID
+	openerTabID     chrome.OptionalTabID
+	mutedInfo       chrome.OptionalMutedInfo
+	sessionID       chrome.OptionalSessionID
+	status          chrome.OptionalTabStatus
+	width           chrome.OptionalWidth
 }
 
 func (t *Tab) Active() bool {
@@ -114,7 +38,7 @@ func (t *Tab) Active() bool {
 }
 
 func (t *Tab) Audible() chrome.OptionalBool {
-	return &x.OptionalBool{V: &t.audible}
+	return &x.OptionalBool{Value: &t.audible}
 }
 
 func (t *Tab) AutoDiscardable() bool {
@@ -126,7 +50,7 @@ func (t *Tab) Discarded() bool {
 }
 
 func (t *Tab) FavIconURL() chrome.OptionalString {
-	return &x.OptionalString{V: &t.favIconURL}
+	return &x.OptionalString{value: &t.favIconURL}
 }
 
 func (t *Tab) GroupID() chrome.GroupID {
@@ -134,7 +58,7 @@ func (t *Tab) GroupID() chrome.GroupID {
 }
 
 func (t *Tab) Height() chrome.OptionalHeight {
-	return &x.OptionalHeight{Value: &t.height}
+	return &x.OptionalHeight{value: &t.height}
 }
 
 func (t *Tab) Highlighted() bool {
@@ -162,7 +86,7 @@ func (t *Tab) OpenerTabID() chrome.OptionalTabID {
 }
 
 func (t *Tab) PendingURL() chrome.OptionalString {
-	return &x.OptionalString{V: &t.pendingURL}
+	return &x.OptionalString{value: &t.pendingURL}
 }
 
 func (t *Tab) Pinned() bool {
@@ -174,7 +98,7 @@ func (t *Tab) Selected() bool {
 }
 
 func (t *Tab) SessionID() chrome.OptionalSessionID {
-	return &sessions.OptionalSessionID{V: &t.sessionID}
+	return &sessions.OptionalSessionID{Value: &t.sessionID}
 }
 
 func (t *Tab) Status() chrome.OptionalTabStatus {
@@ -182,15 +106,15 @@ func (t *Tab) Status() chrome.OptionalTabStatus {
 }
 
 func (t *Tab) Title() chrome.OptionalString {
-	return &x.OptionalString{V: &t.title}
+	return &x.OptionalString{value: &t.title}
 }
 
 func (t *Tab) URL() chrome.OptionalString {
-	return &x.OptionalString{V: &t.url}
+	return &x.OptionalString{value: &t.url}
 }
 
 func (t *Tab) Width() chrome.OptionalWidth {
-	return &x.OptionalWidth{V: &t.width}
+	return &x.OptionalWidth{value: &t.width}
 }
 
 func (t *Tab) WindowID() chrome.WindowID {

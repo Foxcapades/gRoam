@@ -3,77 +3,77 @@ package x
 import "github.com/foxcapades/groam/v0/pkg/chrome"
 
 type OptionalHeight struct {
-	Value *chrome.Height
+	value *chrome.Height
 }
 
 func (o *OptionalHeight) IsPresent() bool {
-	return o.Value != nil
+	return o.value != nil
 }
 
 func (o *OptionalHeight) IsAbsent() bool {
-	return o.Value == nil
+	return o.value == nil
 }
 
 func (o *OptionalHeight) Clear() {
-	o.Value = nil
+	o.value = nil
 }
 
 func (o *OptionalHeight) Get() chrome.Height {
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalHeight) Set(b chrome.Height) {
-	o.Value = &b
+	o.value = &b
 }
 
 func (o *OptionalHeight) OrElse(b chrome.Height) chrome.Height {
-	if o.Value == nil {
+	if o.value == nil {
 		return b
 	}
 
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalHeight) With(f func(chrome.Height)) {
-	if o.Value != nil {
-		f(*o.Value)
+	if o.value != nil {
+		f(*o.value)
 	}
 }
 
 type OptionalWidth struct {
-	V *chrome.Width
+	value *chrome.Width
 }
 
 func (o *OptionalWidth) IsPresent() bool {
-	return o.V != nil
+	return o.value != nil
 }
 
 func (o *OptionalWidth) IsAbsent() bool {
-	return o.V == nil
+	return o.value == nil
 }
 
 func (o *OptionalWidth) Clear() {
-	o.V = nil
+	o.value = nil
 }
 
 func (o *OptionalWidth) Get() chrome.Width {
-	return *o.V
+	return *o.value
 }
 
 func (o *OptionalWidth) Set(b chrome.Width) {
-	o.V = &b
+	o.value = &b
 }
 
 func (o *OptionalWidth) OrElse(b chrome.Width) chrome.Width {
-	if o.V == nil {
+	if o.value == nil {
 		return b
 	}
 
-	return *o.V
+	return *o.value
 }
 
 func (o *OptionalWidth) With(f func(chrome.Width)) {
-	if o.V != nil {
-		f(*o.V)
+	if o.value != nil {
+		f(*o.value)
 	}
 }

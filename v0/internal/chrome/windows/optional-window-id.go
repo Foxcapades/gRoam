@@ -3,27 +3,27 @@ package windows
 import "github.com/foxcapades/groam/v0/pkg/chrome"
 
 type OptionalWindowID struct {
-	Value *chrome.WindowID
+	value *chrome.WindowID
 }
 
 func (o *OptionalWindowID) IsPresent() bool {
-	return o.Value != nil
+	return o.value != nil
 }
 
 func (o *OptionalWindowID) IsAbsent() bool {
-	return o.Value == nil
+	return o.value == nil
 }
 
 func (o *OptionalWindowID) Clear() {
-	o.Value = nil
+	o.value = nil
 }
 
 func (o *OptionalWindowID) Get() chrome.WindowID {
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalWindowID) Set(id chrome.WindowID) {
-	o.Value = &id
+	o.value = &id
 }
 
 func (o *OptionalWindowID) OrElse(id chrome.WindowID) chrome.WindowID {
@@ -31,11 +31,11 @@ func (o *OptionalWindowID) OrElse(id chrome.WindowID) chrome.WindowID {
 		return id
 	}
 
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalWindowID) With(f func(chrome.WindowID)) {
 	if o.IsPresent() {
-		f(*o.Value)
+		f(*o.value)
 	}
 }

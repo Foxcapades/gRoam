@@ -10,5 +10,5 @@ type MessageOptions struct {
 }
 
 func (m *MessageOptions) IncludeTLSChannelID() chrome.OptionalBool {
-	return &x.OptionalBool{V: &m.includeTLS}
+	return &x.OptionalBool{Value: &m.includeTLS}
 }

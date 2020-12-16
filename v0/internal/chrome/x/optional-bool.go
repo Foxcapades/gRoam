@@ -1,39 +1,39 @@
 package x
 
 type OptionalBool struct {
-	V **bool
+	Value *bool
 }
 
 func (o *OptionalBool) IsPresent() bool {
-	return *o.V != nil
+	return o.Value != nil
 }
 
 func (o *OptionalBool) IsAbsent() bool {
-	return *o.V == nil
+	return o.Value == nil
 }
 
 func (o *OptionalBool) Clear() {
-	*o.V = nil
+	o.Value = nil
 }
 
 func (o *OptionalBool) Get() bool {
-	return **o.V
+	return *o.Value
 }
 
 func (o *OptionalBool) Set(b bool) {
-	*o.V = &b
+	o.Value = &b
 }
 
 func (o *OptionalBool) OrElse(b bool) bool {
-	if *o.V == nil {
+	if o.Value == nil {
 		return b
 	}
 
-	return **o.V
+	return *o.Value
 }
 
 func (o *OptionalBool) With(f func(bool)) {
-	if o.V != nil {
-		f(**o.V)
+	if o.Value != nil {
+		f(*o.Value)
 	}
 }

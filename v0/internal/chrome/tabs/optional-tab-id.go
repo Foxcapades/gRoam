@@ -3,39 +3,39 @@ package tabs
 import "github.com/foxcapades/groam/v0/pkg/chrome"
 
 type OptionalTabID struct {
-	v **chrome.TabID
+	value *chrome.TabID
 }
 
 func (o *OptionalTabID) IsPresent() bool {
-	return *o.v != nil
+	return o.value != nil
 }
 
 func (o *OptionalTabID) IsAbsent() bool {
-	return *o.v == nil
+	return o.value == nil
 }
 
 func (o *OptionalTabID) Clear() {
-	*o.v = nil
+	o.value = nil
 }
 
 func (o *OptionalTabID) Get() chrome.TabID {
-	return **o.v
+	return *o.value
 }
 
 func (o *OptionalTabID) Set(id chrome.TabID) {
-	*o.v = &id
+	o.value = &id
 }
 
 func (o *OptionalTabID) OrElse(id chrome.TabID) chrome.TabID {
-	if *o.v == nil {
+	if o.value == nil {
 		return id
 	}
 
-	return **o.v
+	return *o.value
 }
 
 func (o *OptionalTabID) With(f func(chrome.TabID)) {
-	if *o.v != nil {
-		f(**o.v)
+	if o.value != nil {
+		f(*o.value)
 	}
 }

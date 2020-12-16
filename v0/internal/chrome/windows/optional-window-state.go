@@ -5,32 +5,32 @@ import (
 )
 
 type OptionalWindowState struct {
-	Value *chrome.WindowState
+	value *chrome.WindowState
 }
 
 func (o *OptionalWindowState) IsPresent() bool {
-	return o.Value != nil
+	return o.value != nil
 }
 
 func (o *OptionalWindowState) IsAbsent() bool {
-	return o.Value == nil
+	return o.value == nil
 }
 
 func (o *OptionalWindowState) Clear() {
-	o.Value = nil
+	o.value = nil
 }
 
 func (o *OptionalWindowState) Get() chrome.WindowState {
-	return *o.Value
+	return *o.value
 }
 
 func (o *OptionalWindowState) Set(state chrome.WindowState) {
-	o.Value = &state
+	o.value = &state
 }
 
 func (o *OptionalWindowState) OrElse(state chrome.WindowState) chrome.WindowState {
 	if o.IsPresent() {
-		return *o.Value
+		return *o.value
 	}
 
 	return state

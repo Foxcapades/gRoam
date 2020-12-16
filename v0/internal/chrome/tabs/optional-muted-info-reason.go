@@ -5,39 +5,39 @@ import (
 )
 
 type OptionalMutedInfoReason struct {
-	v **chrome.MutedInfoReason
+	value *chrome.MutedInfoReason
 }
 
 func (o *OptionalMutedInfoReason) IsPresent() bool {
-	return *o.v != nil
+	return o.value != nil
 }
 
 func (o *OptionalMutedInfoReason) IsAbsent() bool {
-	return *o.v == nil
+	return o.value == nil
 }
 
 func (o *OptionalMutedInfoReason) Clear() {
-	*o.v = nil
+	o.value = nil
 }
 
 func (o *OptionalMutedInfoReason) Get() chrome.MutedInfoReason {
-	return **o.v
+	return *o.value
 }
 
 func (o *OptionalMutedInfoReason) Set(info chrome.MutedInfoReason) {
-	*o.v = &info
+	o.value = &info
 }
 
 func (o *OptionalMutedInfoReason) OrElse(info chrome.MutedInfoReason) chrome.MutedInfoReason {
-	if *o.v == nil {
+	if o.value == nil {
 		return info
 	}
 
-	return **o.v
+	return *o.value
 }
 
 func (o *OptionalMutedInfoReason) With(f func(chrome.MutedInfoReason)) {
-	if *o.v != nil {
-		f(**o.v)
+	if o.value != nil {
+		f(*o.value)
 	}
 }
