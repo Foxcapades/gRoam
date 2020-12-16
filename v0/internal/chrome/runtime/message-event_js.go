@@ -12,7 +12,7 @@ import (
 
 func NewMessageEvent(val js.Value) chrome.RuntimeMessageEvent {
 	out := new(MessageEvent)
-	out.Event = x.NewEvent(val, js.FuncOf(out.listener))
+	out.Event = x.NewEvent(val, out.listener)
 
 	return out
 }

@@ -29,7 +29,7 @@ type OptionalF32 interface {
 
 	Get() float32
 	Set(float32)
-	OrElse(float32)
+	OrElse(float32) float32
 	With(func(float32))
 }
 

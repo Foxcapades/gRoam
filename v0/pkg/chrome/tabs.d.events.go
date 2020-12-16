@@ -6,7 +6,7 @@ type (
 	TabActivatedEvent interface {
 		Event
 
-		AddListener(TabActivatedListener)
+		AddListener(key interface{}, cb TabActivatedListener)
 	}
 
 	TabActivatedInfo interface {
@@ -24,7 +24,7 @@ type (
 	TabSelectionEvent interface {
 		Event
 
-		AddListener(TabSelectionListener)
+		AddListener(key interface{}, cb TabSelectionListener)
 	}
 
 	TabSelectInfo interface {
@@ -39,7 +39,7 @@ type (
 	TabAttachEvent interface {
 		Event
 
-		AddListener(TabAttachListener)
+		AddListener(key interface{}, cb TabAttachListener)
 	}
 
 	TabAttachInfo interface {
@@ -53,7 +53,7 @@ type (
 
 	TabCreateEvent interface {
 		Event
-		AddListener(TabCreateListener)
+		AddListener(key interface{}, cb TabCreateListener)
 	}
 )
 
@@ -62,7 +62,7 @@ type (
 
 	TabDetachEvent interface {
 		Event
-		AddListener(TabDetachListener)
+		AddListener(key interface{}, cb TabDetachListener)
 	}
 
 	TabDetachInfo interface {
@@ -76,7 +76,7 @@ type (
 
 	TabHighlightEvent interface {
 		Event
-		AddListener(TabHighlightListener)
+		AddListener(key interface{}, cb TabHighlightListener)
 	}
 
 	TabHighlightChangeInfo interface {
@@ -90,7 +90,7 @@ type (
 
 	TabMoveEvent interface {
 		Event
-		AddListener(TabMoveListener)
+		AddListener(key interface{}, cb TabMoveListener)
 	}
 
 	TabMoveInfo interface {
@@ -105,7 +105,7 @@ type (
 
 	TabRemovalEvent interface {
 		Event
-		AddListener(TabRemoveListener)
+		AddListener(key interface{}, cb TabRemoveListener)
 	}
 
 	TabRemovalInfo interface {
@@ -122,7 +122,7 @@ type (
 
 	TabReplaceEvent interface {
 		Event
-		AddListener(TabReplaceListener)
+		AddListener(key interface{}, cb TabReplaceListener)
 	}
 )
 
@@ -131,7 +131,7 @@ type (
 
 	TabUpdateEvent interface {
 		Event
-		AddListener(TabUpdateListener)
+		AddListener(key interface{}, cb TabUpdateListener)
 	}
 
 	// Lists the changes to the state of the tab that was updated.
@@ -173,7 +173,7 @@ type (
 
 	ZoomChangeEvent interface {
 		Event
-		AddListener(ZoomChangeListener)
+		AddListener(key interface{}, cb ZoomChangeListener)
 	}
 
 	ZoomChangeInfo interface {

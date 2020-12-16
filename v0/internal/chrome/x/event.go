@@ -7,10 +7,12 @@ import (
 	"syscall/js"
 )
 
-func NewEvent(root js.Value, handler js.Func) (out Event) {
+type HandlerFunc = func(js.Value, []js.Value) interface{}
+
+func NewEvent(root js.Value, handler HandlerFunc) (out Event) {
 	out.Root = root
 	out.Listeners = make(map[interface{}]interface{})
-	out.Handler = handler
+	out.Handler = js.FuncOf(handler)
 
 	root.Call(JsFnAddListener, handler)
 

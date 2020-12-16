@@ -12,7 +12,7 @@ import (
 
 func NewConnectEvent(val js.Value) (out *ConnectEvent) {
 	out = new(ConnectEvent)
-	out.Event = x.NewEvent(val, js.FuncOf(out.listener))
+	out.Event = x.NewEvent(val, out.listener)
 
 	return out
 }
