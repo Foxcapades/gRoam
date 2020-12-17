@@ -67,7 +67,7 @@ func (a *API) Discard(id chrome.TabID) chrome.Tab {
 func (a *API) DiscardAsync(id chrome.TabID, cb chrome.TabCallback) {
 	panic("implement me")
 }
-
+/home/ellie/Code/go/src/github.com/gojp
 func (a *API) Duplicate(id chrome.TabID) chrome.Tab {
 	panic("implement me")
 }
@@ -170,7 +170,7 @@ func (a *API) InsertCSS(id *chrome.TabID, details chrome.InjectDetails) {
 
 func (a *API) InsertCSSAsync(id *chrome.TabID, details chrome.InjectDetails, cb chrome.EmptyCallback) {
 	panic("implement me")
-}
+}/home/ellie/Code/go/src/github.com/gojp
 
 func (a *API) MoveSingle(id chrome.TabID, props chrome.TabMoveProperties) chrome.Tab {
 	panic("implement me")
@@ -261,19 +261,58 @@ func (a *API) SetZoomSettingsAsync(id *chrome.TabID, zoom chrome.ZoomSettings, c
 }
 
 func (a *API) UngroupSingle(id chrome.TabID) {
-	panic("implement me")
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnUngroup, int(id), fn)
+	wg.Wait()
 }
 
-func (a *API) UngroupSingleAsync(id chrome.TabID, callback chrome.EmptyCallback) {
-	panic("implement me")
+func (a *API) UngroupSingleAsync(id chrome.TabID, cb chrome.EmptyCallback) {
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		cb()
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnUngroup, int(id), fn)
 }
 
 func (a *API) UngroupMultiple(ids []chrome.TabID) {
-	panic("implement me")
+	input := x.JsArray.New(len(ids))
+	for i := range ids {
+		input.SetIndex(i, int(ids[i]))
+	}
+
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnUngroup, input, fn)
+	wg.Wait()
 }
 
-func (a *API) UngroupMultipleAsync(ids []chrome.TabID, callback chrome.EmptyCallback) {
-	panic("implement me")
+func (a *API) UngroupMultipleAsync(ids []chrome.TabID, cb chrome.EmptyCallback) {
+	input := x.JsArray.New(len(ids))
+	for i := range ids {
+		input.SetIndex(i, int(ids[i]))
+	}
+
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		cb()
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnUngroup, input, fn)
+
 }
 
 func (a *API) Update(id *chrome.TabID, update chrome.TabUpdateProperties) chrome.Tab {
@@ -285,55 +324,107 @@ func (a *API) UpdateAsync(id *chrome.TabID, update chrome.TabUpdateProperties, c
 }
 
 func (a *API) OnActivated() chrome.TabActivatedEvent {
-	panic("implement me")
+	if a.onActivated == nil {
+		a.onActivated = NewActivatedEvent(a.root.Get(x.JsKeyOnActivated))
+	}
+
+	return a.onActivated
 }
 
 func (a *API) OnActiveChanged() chrome.TabSelectionEvent {
-	panic("implement me")
+	if a.onActiveChanged == nil {
+		a.onActiveChanged = NewSelectionEvent(a.root.Get(x.JsKeyOnActiveChanged))
+	}
+
+	return a.onActiveChanged
 }
 
 func (a *API) OnAttached() chrome.TabAttachEvent {
-	panic("implement me")
+	if a.onAttached == nil {
+		a.onAttached = NewAttachEvent(a.root.Get(x.JsKeyOnAttached))
+	}
+
+	return a.onAttached
 }
 
 func (a *API) OnCreated() chrome.TabCreateEvent {
-	panic("implement me")
+	if a.onCreated == nil {
+		a.onCreated = NewCreateEvent(a.root.Get(x.JsKeyOnCreated))
+	}
+
+	return a.onCreated
 }
 
 func (a *API) OnDetached() chrome.TabDetachEvent {
-	panic("implement me")
+	if a.onDetached == nil {
+		a.onDetached = NewDetachEvent(a.root.Get(x.JsKeyOnDetached))
+	}
+
+	return a.onDetached
 }
 
 func (a *API) OnHighlightChanged() chrome.TabHighlightEvent {
-	panic("implement me")
+	if a.onHighlightChanged == nil {
+		a.onHighlightChanged = NewHighlightEvent(a.root.Get(x.JsKeyOnHighlightChanged))
+	}
+
+	return a.onHighlightChanged
 }
 
 func (a *API) OnHighlighted() chrome.TabHighlightEvent {
-	panic("implement me")
+	if a.onHighlighted == nil {
+		a.onHighlighted = NewHighlightEvent(a.root.Get(x.JsKeyOnHighlighted))
+	}
+
+	return a.onHighlighted
 }
 
 func (a *API) OnMoved() chrome.TabMoveEvent {
-	panic("implement me")
+	if a.onMoved == nil {
+		a.onMoved = NewMoveEvent(a.root.Get(x.JsKeyOnMoved))
+	}
+
+	return a.onMoved
 }
 
 func (a *API) OnRemoved() chrome.TabRemovalEvent {
-	panic("implement me")
+	if a.onRemoved == nil {
+		a.onRemoved = NewRemoveEvent(a.root.Get(x.JsKeyOnRemoved))
+	}
+
+	return a.onRemoved
 }
 
 func (a *API) OnReplaced() chrome.TabReplaceEvent {
-	panic("implement me")
+	if a.onReplaced == nil {
+		a.onReplaced = NewReplaceEvent(a.root.Get(x.JsKeyOnReplaced))
+	}
+
+	return a.onReplaced
 }
 
 func (a *API) OnSelectionChanged() chrome.TabSelectionEvent {
-	panic("implement me")
+	if a.onSelectionChanged == nil {
+		a.onSelectionChanged = NewSelectionEvent(a.root.Get(x.JsKeyOnSelectionChanged))
+	}
+
+	return a.onSelectionChanged
 }
 
 func (a *API) OnUpdated() chrome.TabUpdateEvent {
-	panic("implement me")
+	if a.onUpdated == nil {
+		a.onUpdated = NewUpdateEvent(a.root.Get(x.JsKeyOnUpdated))
+	}
+
+	return a.UpdateEvent
 }
 
 func (a *API) OnZoomChange() chrome.ZoomChangeEvent {
-	panic("implement me")
+	if a.onZoomChange == nil {
+		a.onZoomChange = NewZoomChangeEvent(a.root.Get(x.JsKeyOnZoomChange))
+	}
+
+	return a.onZoomChange
 }
 
 func (a *API) Release() {
