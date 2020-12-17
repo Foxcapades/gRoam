@@ -146,7 +146,7 @@ type (
 		Discarded() OptionalBool
 
 		// The tab's new discarded state.
-		FavIconURL() OptionalBool
+		FavIconURL() OptionalString
 
 		// The tab's new group.
 		GroupID() OptionalGroupID

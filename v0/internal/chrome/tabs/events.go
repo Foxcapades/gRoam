@@ -17,16 +17,16 @@ type UpdateEvent struct {
 	x.Event
 }
 
-func (t *UpdateEvent) AddListener(key interface{}, cb chrome.TabUpdateListener) {
-	t.Listeners[key] = cb
+func (u *UpdateEvent) AddListener(key interface{}, cb chrome.TabUpdateListener) {
+	u.Listeners[key] = cb
 }
 
 type SelectEvent struct {
 	x.Event
 }
 
-func (t *SelectEvent) AddListener(key interface{}, cb chrome.TabSelectionListener) {
-	t.Listeners[key] = cb
+func (s *SelectEvent) AddListener(key interface{}, cb chrome.TabSelectionListener) {
+	s.Listeners[key] = cb
 }
 
 type ReplaceEvent struct {

@@ -192,15 +192,15 @@ func (a *API) Query(info chrome.TabQueryInfo) []chrome.Tab {
 	panic("implement me")
 }
 
-func (a *API) QueryAsync(info chrome.TabQueryInfo, callback chrome.TabSliceCallback) {
+func (a *API) QueryAsync(info chrome.TabQueryInfo, cb chrome.TabSliceCallback) {
 	panic("implement me")
 }
 
-func (a *API) Reload(id chrome.TabID, properties chrome.TabReloadProperties) {
+func (a *API) Reload(id chrome.TabID, props chrome.TabReloadProperties) {
 	panic("implement me")
 }
 
-func (a *API) ReloadAsync(id chrome.TabID, properties chrome.TabReloadProperties, callback chrome.EmptyCallback) {
+func (a *API) ReloadAsync(id chrome.TabID, props chrome.TabReloadProperties, cb chrome.EmptyCallback) {
 	panic("implement me")
 }
 
@@ -208,7 +208,7 @@ func (a *API) RemoveSingle(id chrome.TabID) {
 	panic("implement me")
 }
 
-func (a *API) RemoveSingleAsync(id chrome.TabID, callback chrome.EmptyCallback) {
+func (a *API) RemoveSingleAsync(id chrome.TabID, cb chrome.EmptyCallback) {
 	panic("implement me")
 }
 
@@ -253,11 +253,34 @@ func (a *API) SetZoomAsync(id *chrome.TabID, zoom float32, cb chrome.EmptyCallba
 }
 
 func (a *API) SetZoomSettings(id *chrome.TabID, zoom chrome.ZoomSettings) {
-	panic("implement me")
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJs(zoom), fn)
+	} else {
+		a.root.Call(x.JsFnSetZoomSettings, int(*id). ZoomSettingsToJs(zoom), fn)
+	}
+
+	wg.Wait()
 }
 
 func (a *API) SetZoomSettingsAsync(id *chrome.TabID, zoom chrome.ZoomSettings, cb chrome.EmptyCallback) {
-	panic("implement me")
+	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
+		cb()
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJs(zoom), fn)
+	} else {
+		a.root.Call(x.JsFnSetZoomSettings, int(*id). ZoomSettingsToJs(zoom), fn)
+	}
 }
 
 func (a *API) UngroupSingle(id chrome.TabID) {
@@ -416,7 +439,7 @@ func (a *API) OnUpdated() chrome.TabUpdateEvent {
 		a.onUpdated = NewUpdateEvent(a.root.Get(x.JsKeyOnUpdated))
 	}
 
-	return a.UpdateEvent
+	return a.onUpdated
 }
 
 func (a *API) OnZoomChange() chrome.ZoomChangeEvent {
