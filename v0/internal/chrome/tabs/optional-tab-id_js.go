@@ -19,3 +19,9 @@ func NewOptionalTabID(val js.Value) chrome.OptionalTabID {
 
 	return out
 }
+
+func PutOptionalTabID(obj js.Value, key string, opt chrome.OptionalTabID) {
+	if opt.IsPresent() {
+		obj.Set(key, opt.Get())
+	}
+}

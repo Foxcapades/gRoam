@@ -19,3 +19,13 @@ func NewOptionalBool(val js.Value) chrome.OptionalBool {
 
 	return out
 }
+
+func PutOptionalBool(obj js.Value, key string, opt chrome.OptionalBool) {
+	if opt.IsPresent() {
+		if opt.Get() {
+			obj.Set(key, JsTrue)
+		} else {
+			obj.Set(key, JsFalse)
+		}
+	}
+}

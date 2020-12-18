@@ -72,16 +72,11 @@ type (
 )
 
 type (
-	TabHighlightListener = func(TabHighlightChangeInfo)
+	TabHighlightListener = func(TabHighlightInfo)
 
 	TabHighlightEvent interface {
 		Event
 		AddListener(key interface{}, cb TabHighlightListener)
-	}
-
-	TabHighlightChangeInfo interface {
-		TabIDs() TabID
-		WindowID() WindowID
 	}
 )
 

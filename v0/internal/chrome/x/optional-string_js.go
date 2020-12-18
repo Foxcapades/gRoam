@@ -19,3 +19,9 @@ func NewOptionalString(val js.Value) chrome.OptionalString {
 
 	return out
 }
+
+func PutOptionalString(obj js.Value, key string, opt chrome.OptionalString) {
+	if opt.IsPresent() {
+		obj.Set(key, opt.Get())
+	}
+}

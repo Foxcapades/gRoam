@@ -411,3 +411,8 @@ type TabUpdateProperties interface {
 	URL() OptionalString
 	SetURL(string) TabUpdateProperties
 }
+
+type TabHighlightInfo interface {
+	TabIDs() []TabID
+	WindowID() WindowID
+}

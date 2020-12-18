@@ -33,32 +33,32 @@ type ReplaceEvent struct {
 	x.Event
 }
 
-func (t *ReplaceEvent) AddListener(key interface{}, cb chrome.TabReplaceListener) {
-	t.Listeners[key] = cb
+func (r *ReplaceEvent) AddListener(key interface{}, cb chrome.TabReplaceListener) {
+	r.Listeners[key] = cb
 }
 
 type RemovalEvent struct {
 	x.Event
 }
 
-func (t *RemovalEvent) AddListener(key interface{}, cb chrome.TabRemoveListener) {
-	t.Listeners[key] = cb
+func (r *RemovalEvent) AddListener(key interface{}, cb chrome.TabRemoveListener) {
+	r.Listeners[key] = cb
 }
 
 type MoveEvent struct {
 	x.Event
 }
 
-func (t *MoveEvent) AddListener(key interface{}, cb chrome.TabMoveListener) {
-	t.Listeners[key] = cb
+func (m *MoveEvent) AddListener(key interface{}, cb chrome.TabMoveListener) {
+	m.Listeners[key] = cb
 }
 
 type HighlightEvent struct {
 	x.Event
 }
 
-func (t *HighlightEvent) AddListener(key interface{}, cb chrome.TabHighlightListener) {
-	t.Listeners[key] = cb
+func (h *HighlightEvent) AddListener(key interface{}, cb chrome.TabHighlightListener) {
+	h.Listeners[key] = cb
 }
 
 type DetachEvent struct {

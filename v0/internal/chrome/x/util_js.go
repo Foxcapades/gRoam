@@ -10,8 +10,12 @@ import (
 	"github.com/foxcapades/groam/v0/pkg/chrome"
 )
 
-var JsObject = js.Global().Get("Object")
-var JsArray = js.Global().Get("Array")
+var (
+	JsObject = js.Global().Get("Object")
+	JsArray  = js.Global().Get("Array")
+	JsTrue   = js.ValueOf(true)
+	JsFalse  = js.ValueOf(false)
+)
 
 func EmptyAsyncCB(cb chrome.EmptyCallback) js.Func {
 	return js.FuncOf(func(js.Value, []js.Value) interface{} {

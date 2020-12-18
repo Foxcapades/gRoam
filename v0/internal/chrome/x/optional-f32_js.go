@@ -19,3 +19,9 @@ func NewOptionalF32(val js.Value) chrome.OptionalF32 {
 
 	return out
 }
+
+func PutOptionalF32(obj js.Value, key string, opt chrome.OptionalF32) {
+	if opt.IsPresent() {
+		obj.Set(key, opt.Get())
+	}
+}

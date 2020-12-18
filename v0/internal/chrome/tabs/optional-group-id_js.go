@@ -1,3 +1,6 @@
+// +build js,wasm
+// +build chrome
+
 package tabs
 
 import (

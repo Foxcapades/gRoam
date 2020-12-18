@@ -28,3 +28,13 @@ func NewZoomChangeInfo(val js.Value) chrome.ZoomChangeInfo {
 
 	return out
 }
+
+func ZoomSettingsToJS(zoom chrome.ZoomSettings) js.Value {
+	out := x.JsObject.New()
+
+	x.PutOptionalF32(out, x.JsKeyDefaultZoomFactor, zoom.DefaultZoomFactor())
+	PutOptionalZoomSettingsMode(out, x.JsKeyMode, zoom.Mode())
+	PutOptionalZoomSettingsScope(out, x.JsKeyScope, zoom.Scope())
+
+	return out
+}

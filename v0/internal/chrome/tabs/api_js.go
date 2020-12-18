@@ -156,11 +156,11 @@ func (a *API) GroupAsync(opts chrome.GroupOptions, cb chrome.GroupIDCallback) {
 	panic("implement me")
 }
 
-func (a *API) Highlight(h chrome.HighlightInfo) chrome.Window {
+func (a *API) Highlight(h chrome.TabHighlightInfo) chrome.Window {
 	panic("implement me")
 }
 
-func (a *API) HighlightAsync(h chrome.HighlightInfo, callback chrome.WindowCallback) {
+func (a *API) HighlightAsync(h chrome.TabHighlightInfo, callback chrome.WindowCallback) {
 	panic("implement me")
 }
 
@@ -170,7 +170,7 @@ func (a *API) InsertCSS(id *chrome.TabID, details chrome.InjectDetails) {
 
 func (a *API) InsertCSSAsync(id *chrome.TabID, details chrome.InjectDetails, cb chrome.EmptyCallback) {
 	panic("implement me")
-}/home/ellie/Code/go/src/github.com/gojp
+}
 
 func (a *API) MoveSingle(id chrome.TabID, props chrome.TabMoveProperties) chrome.Tab {
 	panic("implement me")
@@ -228,28 +228,93 @@ func (a *API) RemoveCSSAsync(id *chrome.TabID, details chrome.DeleteInjectionDet
 	panic("implement me")
 }
 
-func (a *API) SendMessage(id chrome.TabID, msg interface{}, opts chrome.SendMessageOptions) interface{} {
-	panic("implement me")
+func (a *API) SendMessage(id chrome.TabID, msg interface{}, opts chrome.SendMessageOptions) (out interface{}) {
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		out = args[0]
+		wg.Done()
+
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnSendMessage, id, msg, SendMessageOptionsToJS(opts), fn)
+	wg.Wait()
+
+	return
 }
 
-func (a *API) SendMessageAsync(id chrome.TabID, msg interface{}, opts chrome.SendMessageOptions, responseCB chrome.AnyCallback) {
-	panic("implement me")
+func (a *API) SendMessageAsync(id chrome.TabID, msg interface{}, opts chrome.SendMessageOptions, cb chrome.AnyCallback) {
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		if cb != nil {
+			cb(args[0])
+		}
+
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnSendMessage, id, msg, SendMessageOptionsToJS(opts), fn)
 }
 
-func (a *API) SendRequest(id chrome.TabID, request interface{}) interface{} {
-	panic("implement me")
+func (a *API) SendRequest(id chrome.TabID, request interface{}) (out interface{}) {
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		out = args[0]
+		wg.Done()
+
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnSendRequest, id, request, fn)
+	wg.Wait()
+
+	return
 }
 
-func (a *API) SendRequestAsync(id chrome.TabID, request interface{}, responseCB chrome.AnyCallback) {
-	panic("implement me")
+func (a *API) SendRequestAsync(id chrome.TabID, request interface{}, cb chrome.AnyCallback) {
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		if cb != nil {
+			cb(args[0])
+		}
+
+		return nil
+	})
+	defer fn.Release()
+
+	a.root.Call(x.JsFnSendRequest, id, request, fn)
 }
 
 func (a *API) SetZoom(id *chrome.TabID, zoom float32) {
-	panic("implement me")
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnSetZoom, zoom, fn)
+	} else {
+		a.root.Call(x.JsFnSetZoom, int(*id), zoom, fn)
+	}
+
+	wg.Wait()
 }
 
 func (a *API) SetZoomAsync(id *chrome.TabID, zoom float32, cb chrome.EmptyCallback) {
-	panic("implement me")
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		cb()
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnSetZoom, zoom, fn)
+	} else {
+		a.root.Call(x.JsFnSetZoom, int(*id), zoom, fn)
+	}
 }
 
 func (a *API) SetZoomSettings(id *chrome.TabID, zoom chrome.ZoomSettings) {
@@ -261,15 +326,19 @@ func (a *API) SetZoomSettings(id *chrome.TabID, zoom chrome.ZoomSettings) {
 	defer fn.Release()
 
 	if id == nil {
-		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJs(zoom), fn)
+		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJS(zoom), fn)
 	} else {
-		a.root.Call(x.JsFnSetZoomSettings, int(*id). ZoomSettingsToJs(zoom), fn)
+		a.root.Call(x.JsFnSetZoomSettings, int(*id), ZoomSettingsToJS(zoom), fn)
 	}
 
 	wg.Wait()
 }
 
-func (a *API) SetZoomSettingsAsync(id *chrome.TabID, zoom chrome.ZoomSettings, cb chrome.EmptyCallback) {
+func (a *API) SetZoomSettingsAsync(
+	id *chrome.TabID,
+	zoom chrome.ZoomSettings,
+	cb chrome.EmptyCallback,
+) {
 	fn := js.FuncOf(func(js.Value, []js.Value) interface{} {
 		cb()
 		return nil
@@ -277,9 +346,9 @@ func (a *API) SetZoomSettingsAsync(id *chrome.TabID, zoom chrome.ZoomSettings, c
 	defer fn.Release()
 
 	if id == nil {
-		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJs(zoom), fn)
+		a.root.Call(x.JsFnSetZoomSettings, ZoomSettingsToJS(zoom), fn)
 	} else {
-		a.root.Call(x.JsFnSetZoomSettings, int(*id). ZoomSettingsToJs(zoom), fn)
+		a.root.Call(x.JsFnSetZoomSettings, int(*id), ZoomSettingsToJS(zoom), fn)
 	}
 }
 
@@ -338,12 +407,38 @@ func (a *API) UngroupMultipleAsync(ids []chrome.TabID, cb chrome.EmptyCallback) 
 
 }
 
-func (a *API) Update(id *chrome.TabID, update chrome.TabUpdateProperties) chrome.Tab {
-	panic("implement me")
+func (a *API) Update(id *chrome.TabID, update chrome.TabUpdateProperties) (tab chrome.Tab) {
+	wg := x.NewWaitSingle()
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		tab = NewTab(args[0])
+		wg.Done()
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnUpdate, UpdatePropertiesToJS(update), fn)
+	} else {
+		a.root.Call(x.JsFnUpdate, int(*id), UpdatePropertiesToJS(update), fn)
+	}
+
+	wg.Wait()
+
+	return
 }
 
 func (a *API) UpdateAsync(id *chrome.TabID, update chrome.TabUpdateProperties, cb chrome.TabCallback) {
-	panic("implement me")
+	fn := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		cb(NewTab(args[0]))
+		return nil
+	})
+	defer fn.Release()
+
+	if id == nil {
+		a.root.Call(x.JsFnUpdate, UpdatePropertiesToJS(update), fn)
+	} else {
+		a.root.Call(x.JsFnUpdate, int(*id), UpdatePropertiesToJS(update), fn)
+	}
 }
 
 func (a *API) OnActivated() chrome.TabActivatedEvent {
